@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"strings"
 	"crypto/md5"
 	"math/rand"
 	"strconv"
@@ -72,8 +71,8 @@ func (gt *GeetestLib)makeFailChallenge()string {
 }
 
 func (gt *GeetestLib)makeResponseFormat(status int,challenge string)string {
-	jsonmap := make(map(string)string)
-	jsonmap["success"]=status,
+	jsonmap := make(map[string]string)
+	jsonmap["success"]=status
 	jsonmap["gt"]=gt.captchaID
 	jsonmap["challenge"]=challenge
 	jsonbyte,_:=json.Marshal(jsonmap)
