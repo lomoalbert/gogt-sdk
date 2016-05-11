@@ -8,6 +8,7 @@ import (
 	"crypto/md5"
 	"math/rand"
 	"strconv"
+	"encoding/json"
 )
 
 const (
@@ -42,12 +43,14 @@ func CreateGeeTest(privateKey, captchaID string) *GeetestLib {
 }
 
 //PreProcess 验证初始化预处理.
-func (gt *GeetestLib)PreProcess() {
-
+func (gt *GeetestLib)PreProcess(userID ...string)int {
+	status, challenge := gt.register(userID...)
+	gt.responseStr = gt.makeResponseFormat(status, challenge)
+	return status
 }
 
-func (gt *GeetestLib)register(userid ...string)(int,string) {
-	challenge := gt.registerChallenge(userid...)
+func (gt *GeetestLib)register(userID ...string)(int,string) {
+	challenge := gt.registerChallenge(userID...)
 	if len(challenge) != 32{
 		return 0,gt.makeFailChallenge()
 	}
@@ -68,15 +71,20 @@ func (gt *GeetestLib)makeFailChallenge()string {
 	return challenge
 }
 
-func (gt *GeetestLib)makeResponseFormat() {
-
+func (gt *GeetestLib)makeResponseFormat(status int,challenge string)string {
+	jsonmap := make(map(string)string)
+	jsonmap["success"]=status,
+	jsonmap["gt"]=gt.captchaID
+	jsonmap["challenge"]=challenge
+	jsonbyte,_:=json.Marshal(jsonmap)
+	return string(jsonbyte)
 }
 
 //registerChallenge
-func (gt *GeetestLib)registerChallenge(userid ...string)(respbytes []byte){
+func (gt *GeetestLib)registerChallenge(userID ...string)(respbytes []byte){
 	var registerURL string
-	if len(userid) == 1 {
-		registerURL = fmt.Sprintf("%s%s?gt=%s&user_id=%s", API_URL, REGISTER_HANDLER, gt.captchaID, userid[0])
+	if len(userID) == 1 {
+		registerURL = fmt.Sprintf("%s%s?gt=%s&user_id=%s", API_URL, REGISTER_HANDLER, gt.captchaID, userID[0])
 	} else {
 		registerURL = fmt.Sprintf("%s%s?gt=%s", API_URL, REGISTER_HANDLER, gt.captchaID)
 	}
