@@ -45,14 +45,14 @@ func GeetestLib(privateKey, captchaID string) *Geetest {
 }
 
 //PreProcess 验证初始化预处理.
-func (gt *Geetest)PreProcess(userID ...string) int {
-	status, challenge := gt.register(userID...)
+func (gt *Geetest)PreProcess(userID string) int {
+	status, challenge := gt.register(userID)
 	gt.responseStr = gt.makeResponseFormat(status, challenge)
 	return status
 }
 
-func (gt *Geetest)register(userID ...string) (int, string) {
-	challenge := gt.registerChallenge(userID...)
+func (gt *Geetest)register(userID string) (int, string) {
+	challenge := gt.registerChallenge(userID)
 	if len(challenge) != 32 {
 		return 0, gt.makeFailChallenge()
 	}
@@ -83,10 +83,10 @@ func (gt *Geetest)makeResponseFormat(status int, challenge string) string {
 }
 
 //registerChallenge
-func (gt *Geetest)registerChallenge(userID ...string) (respbytes []byte) {
+func (gt *Geetest)registerChallenge(userID string) (respbytes []byte) {
 	var registerURL string
-	if len(userID) == 1 {
-		registerURL = fmt.Sprintf("%s%s?gt=%s&user_id=%s", API_URL, REGISTER_HANDLER, gt.captchaID, userID[0])
+	if len(userID) != 0 {
+		registerURL = fmt.Sprintf("%s%s?gt=%s&user_id=%s", API_URL, REGISTER_HANDLER, gt.captchaID, userID)
 	} else {
 		registerURL = fmt.Sprintf("%s%s?gt=%s", API_URL, REGISTER_HANDLER, gt.captchaID)
 	}
@@ -103,7 +103,7 @@ func (gt *Geetest)registerChallenge(userID ...string) (respbytes []byte) {
 }
 
 //SuccessValidate 正常模式的二次验证方式.向geetest server 请求验证结果.
-func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userid string) bool {
+func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) bool {
 	if !gt.checkParam(challenge, validate, seccode) || gt.checkResult(challenge, validate) {
 		return 0
 	}
@@ -111,8 +111,8 @@ func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userid string) b
 	postdata := new(url.Values)
 	postdata.Add("seccode", seccode)
 	postdata.Add("sdk", "golang_" + VERSION)
-	if userid != "" {
-		postdata.Add("user_id", userid)
+	if userID != "" {
+		postdata.Add("user_id", userID)
 	}
 	backinfo := gt.postValues(validateURL, postdata)
 	return backinfo == gt.md5Encode([]byte(seccode))
