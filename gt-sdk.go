@@ -1,4 +1,4 @@
-package gogtsdk
+package gtsdk
 
 import (
 	"fmt"
