@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/lomoalbert/gogt-sdk/demo/controllers"
+	"github.com/lomoalbert/gtsdk/demo/controllers"
 	"github.com/astaxie/beego"
 )
 

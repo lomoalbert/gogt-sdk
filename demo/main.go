@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/lomoalbert/gogt-sdk/demo/routers"
+	_ "github.com/lomoalbert/gtsdk/demo/routers"
 	"github.com/astaxie/beego"
 )
 

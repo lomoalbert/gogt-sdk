@@ -56,7 +56,7 @@ func (gt *Geetest)register(userID string) (int, string) {
 	if len(challenge) != 32 {
 		return 0, gt.makeFailChallenge()
 	}
-	return 2, gt.md5Encode(append(challenge, []byte(gt.privateKey)))
+	return 2, gt.md5Encode(append(challenge, []byte(gt.privateKey)...))
 }
 
 func (gt *Geetest)GetResponseStr() string {
@@ -74,7 +74,7 @@ func (gt *Geetest)makeFailChallenge() string {
 }
 
 func (gt *Geetest)makeResponseFormat(status int, challenge string) string {
-	jsonmap := make(map[string]string)
+	jsonmap := make(map[string]interface{})
 	jsonmap["success"] = status
 	jsonmap["gt"] = gt.captchaID
 	jsonmap["challenge"] = challenge
@@ -105,12 +105,12 @@ func (gt *Geetest)registerChallenge(userID string) (respbytes []byte) {
 //SuccessValidate 正常模式的二次验证方式.向geetest server 请求验证结果.
 func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) bool {
 	if !gt.checkParam(challenge, validate, seccode) || gt.checkResult(challenge, validate) {
-		return 0
+		return false
 	}
 	validateURL := fmt.Sprintf("%s%s", API_URL, VALIDATE_HANDLER)
-	postdata := new(url.Values)
+	postdata := url.Values{}
 	postdata.Add("seccode", seccode)
-	postdata.Add("sdk", "golang_" + VERSION)
+	postdata.Add("sdk", "go_" + VERSION)
 	if userID != "" {
 		postdata.Add("user_id", userID)
 	}
@@ -137,11 +137,11 @@ func (gt *Geetest)checkResult(origin, validate string) bool {
 }
 
 //FailbackValidate failback模式的二次验证方式.在本地对轨迹进行简单的判断返回验证结果.
-func (gt *Geetest)FailbackValidate(challenge, validate, seccode string) int {
+func (gt *Geetest)FailbackValidate(challenge, validate, seccode string) bool {
 	if !gt.checkParam(challenge, validate, seccode) {
 		return false
 	}
-	validate_str := strings.Split(validate, '_')
+	validate_str := strings.Split(validate, "_")
 	if len(validate_str) < 3 {
 		return false
 	}
@@ -164,28 +164,29 @@ func (gt *Geetest)checkParam(params ...string) bool {
 	return true
 }
 
-func (gt *Geetest)validateFailImage(ans, fullBgIndex, imgGrpIndex int) int{
-	thread := 3
-	fullBgIndexStr := gt.md5Encode([]byte(fullBgIndex))[0:10]
-	imgGrpIndexStr := gt.md5Encode([]byte(imgGrpIndex))[0:10]
-	var answerDecode string
+func (gt *Geetest)validateFailImage(ans, fullBgIndex, imgGrpIndex int) bool{
+	var thread float64 = 3
+	fullBgIndexStr := gt.md5Encode([]byte(strconv.Itoa(fullBgIndex)))[0:10]
+	imgGrpIndexStr := gt.md5Encode([]byte(strconv.Itoa(imgGrpIndex)))[0:10]
+	var answerDecode []byte
 	for i := 0; i < 10; i++ {
 		if i % 2 == 0 {
-			answerDecode += fullBgIndexStr[i]
+			answerDecode = append(answerDecode, fullBgIndexStr[i])
 		} else if i % 2 == 1 {
-			answerDecode += imgGrpIndexStr[i]
+			answerDecode = append(answerDecode, imgGrpIndexStr[i])
 		}
 	}
 	xDecode := answerDecode[4:]
-	xInt := int(strconv.ParseInt(string(xDecode), 16, 32))
+	xInt64,err := strconv.ParseInt(string(xDecode), 16, 32)
+	if err != nil{
+		fmt.Println(err.Error())
+	}
+	xInt := int(xInt64)
 	result := xInt % 200
 	if result < 40 {
 		result = 40
 	}
-	if math.Abs(float64(ans - result)) < thread {
-		return 1
-	}
-	return 0
+	return math.Abs(float64(ans - result)) < thread
 }
 
 func (gt *Geetest)md5Encode(values []byte) string {
@@ -194,9 +195,9 @@ func (gt *Geetest)md5Encode(values []byte) string {
 
 func (gt *Geetest)decodeRandBase(challenge string) int {
 	baseStr := challenge[32:]
-	tempList := new([]int)
+	var tempList []int
 	for _, char := range baseStr {
-		tempChar := byte(char)
+		tempChar := int(char)
 		result := tempChar - 48
 		if (tempChar > 57) {
 			result = tempChar - 87
@@ -211,9 +212,9 @@ func (gt *Geetest)decodeResponse(challenge, userresponse string) (res int) {
 		return
 	}
 	digits := []int{1, 2, 5, 10, 50}
-	key := make(map[byte]int)
+	key := make(map[rune]int)
 	for _, i := range challenge {
-		if exist, _ := key[i]; exist {
+		if _,exist := key[i]; exist {
 			continue
 		}
 		value := digits[len(key) % 5]
