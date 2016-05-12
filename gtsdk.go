@@ -110,7 +110,7 @@ func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) b
 	validateURL := fmt.Sprintf("%s%s", API_URL, VALIDATE_HANDLER)
 	postdata := url.Values{}
 	postdata.Add("seccode", seccode)
-	postdata.Add("sdk", "go_" + VERSION)
+	postdata.Add("sdk", "python_" + VERSION)
 	if userID != "" {
 		postdata.Add("user_id", userID)
 	}

@@ -25,14 +25,13 @@ type AjaxValidateController struct {
 }
 
 func (ctl *MainController) Get() {
-	ctl.TplName = "index.tpl"
+	ctl.TplName = "index.html"
 }
 
 func (ctl *RegisterController)Get() {
-	userID := "test"
+	userID := ""
 	gt := gtsdk.GeetestLib(PrivateKey, CaptchaID)
 	status := gt.PreProcess(userID)
-	beego.Debug(status)
 	ctl.SetSession(gtsdk.GT_STATUS_SESSION_KEY, status)
 	ctl.SetSession("user_id", userID)
 	responseStr := gt.GetResponseStr()
@@ -71,7 +70,7 @@ func (ctl *AjaxValidateController)Post(){
 	status := ctl.GetSession(gtsdk.GT_STATUS_SESSION_KEY).(int)
 	userID := ctl.GetSession("user_id").(string)
 	if status == 0 {
-		result = gt.SuccessValidate(challenge, validate, seccode, userID)
+		result = gt.FailbackValidate(challenge, validate, seccode)
 	} else {
 		result = gt.SuccessValidate(challenge, validate, seccode, userID)
 	}
