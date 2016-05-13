@@ -1,13 +1,12 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <title>极验行为式验证 Beego 类网站安装测试页面</title>
+    <title>极验行为式验证 Golang 类网站安装测试页面</title>
     <style>
         body {
             margin: 50px 0;
             text-align: center;
         }
-
         .inp {
             border: 1px solid gray;
             padding: 0 10px;
@@ -15,7 +14,6 @@
             height: 30px;
             font-size: 18px;
         }
-
         .btn {
             border: 1px solid gray;
             width: 100px;
@@ -23,28 +21,20 @@
             font-size: 18px;
             cursor: pointer;
         }
-
         #embed-captcha {
             width: 300px;
             margin: 0 auto;
         }
-
         .show {
             display: block;
         }
-
         .hide {
             display: none;
         }
-
         #notice {
             color: red;
         }
     </style>
-    <!-- 为使用方便，直接使用jquery.js库 -->
-    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
-    <!-- 引入封装了failback的接口--initGeetest -->
-    <script src="http://static.geetest.com/static/tools/gt.js"></script>
 </head>
 <body>
 <h1>极验验证SDKDemo</h1>
@@ -55,7 +45,7 @@
     <h2>弹出式Demo，使用ajax形式提交二次验证码所需的验证结果值</h2>
     <br>
     <p>
-        <label>用户名：</label>
+        <labe>用户名：</labe>
         <input class="inp" type="text" value="极验验证">
     </p>
     <br>
@@ -69,6 +59,12 @@
 
     <div id="popup-captcha"></div>
 </div>
+
+<!-- 为使用方便，直接使用jquery.js库 -->
+<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+<!-- 引入封装了failback的接口--initGeetest -->
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+
 <script>
     var handlerPopup = function (captchaObj) {
         $("#popup-submit").click(function () {
