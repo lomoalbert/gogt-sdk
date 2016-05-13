@@ -77,10 +77,11 @@ Gt Golang SDK
 运行demo
 ---------------------
 
-1. Beego demo运行：进入demo文件夹，运行：
+1. Beego demo运行：进入demo文件夹，运行bee run：
 
 .. code-block:: bash
 
+    $ cd $GOPATH/src/github.com/lomoalbert/gtsdk/demo
     $ bee run
 
 在浏览器中访问http://localhost:8080即可看到Demo界面
