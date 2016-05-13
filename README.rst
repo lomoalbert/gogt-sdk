@@ -1,6 +1,6 @@
 Gt Golang SDK
 ===============
-极验验证的Golang SDK目前提供基于Beego框架的DEMO。
+极验验证的非官方Golang SDK目前提供基于Beego框架的DEMO。
 
 本项目是面向服务器端的，具体使用可以参考极验的 `文档 <http://www.geetest.com/install/sections/idx-server-sdk.html>`_ ,客户端相关开发请参考极验的 `前端文档。 <http://www.geetest.com/install/>`_.
 
