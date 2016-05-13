@@ -11,6 +11,8 @@ import (
 	"strings"
 	"net/url"
 	"math"
+	"log"
+	"io/ioutil"
 )
 
 const (
@@ -85,29 +87,37 @@ func (gt *Geetest)makeResponseFormat(status int, challenge string) string {
 //registerChallenge
 func (gt *Geetest)registerChallenge(userID string) (respbytes []byte) {
 	var registerURL string
-	if len(userID) != 0 {
+	if userID != "" {
 		registerURL = fmt.Sprintf("%s%s?gt=%s&user_id=%s", API_URL, REGISTER_HANDLER, gt.captchaID, userID)
 	} else {
 		registerURL = fmt.Sprintf("%s%s?gt=%s", API_URL, REGISTER_HANDLER, gt.captchaID)
 	}
-	client := http.Client{Timeout: 2 * time.Second }
+	client := http.Client{Timeout: 15 * time.Second }
 	resp, err := client.Get(registerURL)
-	if err != nil || resp.StatusCode != 200 {
-		return
-	}
-	_, err = resp.Body.Read(respbytes)
+	log.Println("err:",registerURL,err)
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
+	defer resp.Body.Close()
+	log.Println("resp.StatusCode",resp.StatusCode)
+	respbytes ,err = ioutil.ReadAll(resp.Body)
+	log.Println(respbytes,err)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.Println(string(respbytes))
 	return
 }
 
 //SuccessValidate 正常模式的二次验证方式.向geetest server 请求验证结果.
 func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) bool {
-	if !gt.checkParam(challenge, validate, seccode) || gt.checkResult(challenge, validate) {
+	if !gt.checkParam(challenge, validate, seccode) || !gt.checkResult(challenge, validate) {
 		return false
 	}
 	validateURL := fmt.Sprintf("%s%s", API_URL, VALIDATE_HANDLER)
+	log.Println(validateURL)
 	postdata := url.Values{}
 	postdata.Add("seccode", seccode)
 	postdata.Add("sdk", "python_" + VERSION)
@@ -124,9 +134,10 @@ func (gt *Geetest)postValues(url string, data url.Values) string {
 	if err != nil {
 		return ""
 	}
-	_, err = resp.Body.Read(respbyte)
+	defer resp.Body.Close()
+	respbyte, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return ""
+		log.Println(err.Error())
 	}
 	return string(respbyte)
 }
@@ -179,7 +190,7 @@ func (gt *Geetest)validateFailImage(ans, fullBgIndex, imgGrpIndex int) bool{
 	xDecode := answerDecode[4:]
 	xInt64,err := strconv.ParseInt(string(xDecode), 16, 32)
 	if err != nil{
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
 	xInt := int(xInt64)
 	result := xInt % 200

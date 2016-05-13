@@ -47,6 +47,7 @@ func (ctl *ValidateController)Post() {
 	seccode := ctl.GetString(gtsdk.FN_SECCODE)
 	status := ctl.GetSession(gtsdk.GT_STATUS_SESSION_KEY).(int)
 	userID := ctl.GetSession("user_id").(string)
+	beego.Debug(challenge, validate, seccode, userID)
 	if status == 0 {
 		result = gt.FailbackValidate(challenge, validate, seccode)
 	} else {
