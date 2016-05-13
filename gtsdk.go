@@ -94,20 +94,16 @@ func (gt *Geetest)registerChallenge(userID string) (respbytes []byte) {
 	}
 	client := http.Client{Timeout: 15 * time.Second }
 	resp, err := client.Get(registerURL)
-	log.Println("err:",registerURL,err)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	defer resp.Body.Close()
-	log.Println("resp.StatusCode",resp.StatusCode)
 	respbytes ,err = ioutil.ReadAll(resp.Body)
-	log.Println(respbytes,err)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
-	log.Println(string(respbytes))
 	return
 }
 
@@ -117,7 +113,6 @@ func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) b
 		return false
 	}
 	validateURL := fmt.Sprintf("%s%s", API_URL, VALIDATE_HANDLER)
-	log.Println(validateURL)
 	postdata := url.Values{}
 	postdata.Add("seccode", seccode)
 	postdata.Add("sdk", "python_" + VERSION)
