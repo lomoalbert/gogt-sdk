@@ -26,7 +26,7 @@ const (
 	REGISTER_HANDLER = "/register.php"
 	VALIDATE_HANDLER = "/validate.php"
 
-	VERSION = "3.2.0"
+	VERSION = "go_3.2.0"
 )
 
 type Geetest struct {
@@ -115,7 +115,7 @@ func (gt *Geetest)SuccessValidate(challenge, validate, seccode, userID string) b
 	validateURL := fmt.Sprintf("%s%s", API_URL, VALIDATE_HANDLER)
 	postdata := url.Values{}
 	postdata.Add("seccode", seccode)
-	postdata.Add("sdk", "python_" + VERSION)
+	postdata.Add("sdk", VERSION)
 	if userID != "" {
 		postdata.Add("user_id", userID)
 	}
