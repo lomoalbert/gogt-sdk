@@ -89,4 +89,4 @@ Gt Golang SDK
 -----------------
 + 3.2.0
 
- - 参照 `gt-python-sdk_3.2.0 <https://github.com/GeeTeam/gt-python-sdk/>`_实现极验接口
+ - 参照 `gt-python-sdk <https://github.com/GeeTeam/gt-python-sdk/>`_ 3.2.0版实现极验接口
