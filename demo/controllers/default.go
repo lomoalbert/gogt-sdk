@@ -29,7 +29,7 @@ func (ctl *MainController) Get() {
 }
 
 func (ctl *RegisterController)Get() {
-	userID := ""
+	var userID = "test"
 	gt := gtsdk.GeetestLib(PrivateKey, CaptchaID)
 	status := gt.PreProcess(userID)
 	ctl.SetSession(gtsdk.GT_STATUS_SESSION_KEY, status)
@@ -47,7 +47,6 @@ func (ctl *ValidateController)Post() {
 	seccode := ctl.GetString(gtsdk.FN_SECCODE)
 	status := ctl.GetSession(gtsdk.GT_STATUS_SESSION_KEY).(int)
 	userID := ctl.GetSession("user_id").(string)
-	beego.Debug(challenge, validate, seccode, userID)
 	if status == 0 {
 		result = gt.FailbackValidate(challenge, validate, seccode)
 	} else {
@@ -63,7 +62,7 @@ func (ctl *ValidateController)Post() {
 
 func (ctl *AjaxValidateController)Post(){
 	var result bool
-	jsondata := make(map[string]string)
+	var jsondata = make(map[string]string)
 	gt := gtsdk.GeetestLib(PrivateKey, CaptchaID)
 	challenge := ctl.GetString(gtsdk.FN_CHALLENGE)
 	validate := ctl.GetString(gtsdk.FN_VALIDATE)

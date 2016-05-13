@@ -58,7 +58,7 @@ func (gt *Geetest)register(userID string) (int, string) {
 	if len(challenge) != 32 {
 		return 0, gt.makeFailChallenge()
 	}
-	return 2, gt.md5Encode(append(challenge, []byte(gt.privateKey)...))
+	return 1, gt.md5Encode(append(challenge, []byte(gt.privateKey)...))
 }
 
 func (gt *Geetest)GetResponseStr() string {
@@ -92,7 +92,7 @@ func (gt *Geetest)registerChallenge(userID string) (respbytes []byte) {
 	} else {
 		registerURL = fmt.Sprintf("%s%s?gt=%s", API_URL, REGISTER_HANDLER, gt.captchaID)
 	}
-	client := http.Client{Timeout: 15 * time.Second }
+	client := http.Client{Timeout: 2 * time.Second }
 	resp, err := client.Get(registerURL)
 	if err != nil {
 		log.Println(err.Error())
@@ -148,6 +148,7 @@ func (gt *Geetest)FailbackValidate(challenge, validate, seccode string) bool {
 		return false
 	}
 	validate_str := strings.Split(validate, "_")
+	log.Println(validate_str,len(validate_str))
 	if len(validate_str) < 3 {
 		return false
 	}
@@ -158,6 +159,7 @@ func (gt *Geetest)FailbackValidate(challenge, validate, seccode string) bool {
 	decodeFbii := gt.decodeResponse(challenge, encodeFbii)
 	decodeIgi := gt.decodeResponse(challenge, encodeIgi)
 	validateResult := gt.validateFailImage(decodeAns, decodeFbii, decodeIgi)
+	log.Println(validateResult)
 	return validateResult
 }
 
@@ -172,14 +174,14 @@ func (gt *Geetest)checkParam(params ...string) bool {
 
 func (gt *Geetest)validateFailImage(ans, fullBgIndex, imgGrpIndex int) bool{
 	var thread float64 = 3
-	fullBgIndexStr := gt.md5Encode([]byte(strconv.Itoa(fullBgIndex)))[0:10]
-	imgGrpIndexStr := gt.md5Encode([]byte(strconv.Itoa(imgGrpIndex)))[0:10]
+	fullBg := gt.md5Encode([]byte(strconv.Itoa(fullBgIndex)))[0:10]
+	imgGrp := gt.md5Encode([]byte(strconv.Itoa(imgGrpIndex)))[10:20]
 	var answerDecode []byte
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 9; i++ {
 		if i % 2 == 0 {
-			answerDecode = append(answerDecode, fullBgIndexStr[i])
+			answerDecode = append(answerDecode, fullBg[i])
 		} else if i % 2 == 1 {
-			answerDecode = append(answerDecode, imgGrpIndexStr[i])
+			answerDecode = append(answerDecode, imgGrp[i])
 		}
 	}
 	xDecode := answerDecode[4:]
